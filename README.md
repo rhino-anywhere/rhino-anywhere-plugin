@@ -12,7 +12,12 @@
 [Please see building source guide](BUILDSOURCE.md)
 
 ## Running
-... TBC ...
+1. Clone this Repo & Build (OR install Yak)
+2. Clone the ([sdk-js repo](https://github.com/rhino-anywhere/sdk-js))
+3. Clone the ([sample-frontend repo](https://github.com/rhino-anywhere/sample-frontend))
+4. Open Rhino
+5. Run `StartRhinoAnywhere`
+6. Run the server by following the guides in the respecive repos
 
 ## Contributing
 
