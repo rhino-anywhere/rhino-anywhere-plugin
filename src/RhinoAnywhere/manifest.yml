@@ -1,0 +1,23 @@
+name: RhinoAnywhere
+version: 0.1.0-wip
+authors:
+- Alfredo Chavez
+- Callum Sykes
+- Dan Cascaval
+- Elftherios Kourkopoulos
+- Emil Poulsen
+- Jo Kamm
+- Josh Grift
+- Kyle Slugg
+- Justyna Szychowska
+- Sergey Pigach
+keywords:
+- Rhino
+- Anywhere
+- Pixel
+- Streaming
+
+description: >
+  Rhino Anywhere is a framework that enables high definition streaming of a Rhino Model Viewport to the web. This allows you to reskin and interact with Rhino in any way you desire, whilst still working in the native Rhino Environment.
+url: "https://github.com/rhino-anywhere"
+icon: Logo.png
