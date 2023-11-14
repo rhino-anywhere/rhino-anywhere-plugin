@@ -34,7 +34,14 @@ namespace RhinoAnywhere
     private static void DisplayPipeline_PostDrawObjects(object sender, DrawEventArgs e)
     {
       if (Server?.Connection is null)
+            {
+                return;
+            }
+
+            if (e.Viewport.Id != e.RhinoDoc.Views.ActiveView.ActiveViewport.Id)
+            {
         return;
+            }
 
       Server.DurationUnits = (uint)DateTime.UtcNow.Subtract(LastCall).TotalMilliseconds;
       LastCall = DateTime.UtcNow;

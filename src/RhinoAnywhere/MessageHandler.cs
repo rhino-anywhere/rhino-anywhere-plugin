@@ -34,7 +34,7 @@ namespace RhinoAnywhere
     public static void HandleResize(string json)
     {
       var viewportSize = JsonSerializer.Deserialize<Packet<ViewportSize>>(json);
-      RhinoDoc.ActiveDoc.Views.ActiveView.Size = new Size((int)viewportSize.data.Width, (int)viewportSize.data.Height);
+      RhinoDoc.ActiveDoc.Views.ActiveView.Size = new Size((int)viewportSize.data.width, (int)viewportSize.data.height);
     }
     public static void HandleScroll(string json)
     {

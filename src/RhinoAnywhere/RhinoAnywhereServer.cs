@@ -27,6 +27,14 @@ namespace RhinoAnywhere
     public RTCPeerConnection Connection { get; set; }
     private WebSocketServer SocketServer { get; set; }
     private VpxVideoEncoder Encoder;
+    /// <summary>
+    /// The last known size; encoder needs to be 
+    /// </summary>
+    private Size lastSize;
+    /// <summary>
+    /// Buffer for RGB values
+    /// </summary>
+    private byte[] bufferRGB;
 
     public Server()
     {
@@ -35,7 +43,6 @@ namespace RhinoAnywhere
       SocketServer.AddWebSocketService<WebRTCWebSocketPeer>("/", (peer) => peer.CreatePeerConnection = () => CreatePeerConnection());
       SocketServer.Start();
       RhinoApp.WriteLine($"Listening for connections on 0.0.0.0:{port}");
-      Encoder = new VpxVideoEncoder();
     }
 
     public void Dispose()
@@ -48,7 +55,7 @@ namespace RhinoAnywhere
     {
       Connection = new RTCPeerConnection(null);
 
-      var testPatternSource = new VideoTestPatternSource(Encoder);
+      VideoTestPatternSource testPatternSource = new VideoTestPatternSource(new VpxVideoEncoder());
 
       MediaStreamTrack videoTrack = new MediaStreamTrack(testPatternSource.GetVideoSourceFormats(), MediaStreamStatusEnum.SendOnly);
       Connection.addTrack(videoTrack);
@@ -96,7 +103,11 @@ namespace RhinoAnywhere
                   _ => throw new NotImplementedException("No"),
                 };
 
+                    Rhino.RhinoApp.InvokeOnUiThread(() =>
+                    {
                 method(json);
+                    });
+
               };
       };
 
@@ -134,17 +145,24 @@ namespace RhinoAnywhere
     public bool SendBitmap(Bitmap bitmap)
     {
       var rect = new Rectangle(new Point(0, 0), new Size(bitmap.Width, bitmap.Height));
-      var bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+      var bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+        if (Encoder == null || bitmap.Size != lastSize)
+        {
+            Encoder?.Dispose();
+            Encoder = new VpxVideoEncoder();
+            bufferRGB = new byte[bitmapData.Stride * bitmapData.Height];
+            lastSize = new Size();
+        }
 
       try
       {
         IntPtr ptr = bitmapData.Scan0;
         int bytes = bitmapData.Stride * bitmap.Height;
-        byte[] rgbValues = new byte[bytes];
 
-        Marshal.Copy(ptr, rgbValues, 0, bytes);
+        Marshal.Copy(ptr, bufferRGB, 0, bytes);
 
-        var encodedVideo = Encoder.EncodeVideo(bitmap.Width, bitmap.Height, rgbValues, VideoPixelFormatsEnum.Bgra, VideoCodecsEnum.H265);
+        var frame = PixelConverter.BGRtoI420(bufferRGB, bitmapData.Width, bitmapData.Height, bitmapData.Stride);
+        var encodedVideo = Encoder.EncodeVideo(bitmap.Width, bitmap.Height, frame, VideoPixelFormatsEnum.I420, VideoCodecsEnum.H265);
         Connection.SendVideo(DurationUnits, encodedVideo);
         return true;
       }
