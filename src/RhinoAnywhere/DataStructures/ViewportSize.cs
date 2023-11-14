@@ -5,9 +5,9 @@
     public struct ViewportSize
     {
         /// <summary>The width of the Viewport</summary>
-        public double Width { get; set; }
+        public double width { get; set; }
 
         /// <summary>The height of the Viewport</summary>
-        public double Height { get; set; }
+        public double height { get; set; }
     }
 }
