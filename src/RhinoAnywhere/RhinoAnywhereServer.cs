@@ -151,7 +151,7 @@ namespace RhinoAnywhere
             Encoder?.Dispose();
             Encoder = new VpxVideoEncoder();
             bufferRGB = new byte[bitmapData.Stride * bitmapData.Height];
-            lastSize = new Size();
+            lastSize = new Size(bitmap.Width, bitmap.Height);
         }
 
       try
